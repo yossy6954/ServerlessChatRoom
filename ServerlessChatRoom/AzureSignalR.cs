@@ -14,8 +14,8 @@ namespace ServerlessChatRoom
 {
     class AzureSignalR {
         class PayloadMessage {
-            public string Name { get; set; }
-            public string Message { get; set; }
+            public string Target { get; set; }
+            public object[] Arguments { get; set; }
         }
 
         private readonly string endpoint;
@@ -73,8 +73,8 @@ namespace ServerlessChatRoom
 
         public async Task SendAsync(string hubName, string methodName, string name, string message) {
             var payload = new PayloadMessage() {
-                Name = name,
-                Message = message
+                Target = methodName,
+                Arguments = new object[]{name, message}
             };
             var url = $"{endpoint}:5002/api/v1-preview/hub/{hubName}";
             var bearer = GenerateJwtBearer(null, url, null, DateTime.UtcNow.AddMinutes(30), accessKey);

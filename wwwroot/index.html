@@ -1,5 +1,6 @@
 ﻿<!DOCTYPE html>
 <html>
+
 <head>
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
     <meta name="viewport" content="width=device-width">
@@ -9,17 +10,16 @@
     <link href="css/site.css" rel="stylesheet" />
     <title>Azure SignalR Group Chat</title>
 </head>
+
 <body>
     <h2 class="text-center" style="margin-top: 0; padding-top: 30px; padding-bottom: 30px;">Azure SignalR Group Chat</h2>
     <div class="container" style="height: calc(100% - 110px);">
         <div id="messages" style="background-color: whitesmoke; "></div>
         <div style="width: 100%; border-left-style: ridge; border-right-style: ridge;">
-            <textarea id="message"
-                          style="width: 100%; padding: 5px 10px; border-style: hidden;" 
-                          placeholder="Type message and press Enter to send..."></textarea>
+            <textarea id="message" style="width: 100%; padding: 5px 10px; border-style: hidden;" placeholder="Type message and press Enter to send..."></textarea>
         </div>
         <div style="overflow: auto; border-style: ridge; border-top-style: hidden;">
-            <button class="btn-warning pull-right" id="echo">Echo</button>
+            <!-- <button class="btn-warning pull-right" id="echo">Echo</button> -->
             <button class="btn-success pull-right" id="sendmessage">Send</button>
         </div>
     </div>
@@ -28,7 +28,8 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <div>Connection Error...</div>
-                    <div><strong style="font-size: 1.5em;">Hit Refresh/F5</strong> to rejoin. ;)</div>
+                    <div>
+                        <strong style="font-size: 1.5em;">Hit Refresh/F5</strong> to rejoin. ;)</div>
                 </div>
             </div>
         </div>
@@ -57,7 +58,7 @@
                     username = '';
                     promptMessage = 'Invalid input. Enter your name:';
                 }
-            } while(!username)
+            } while (!username)
 
             // Set initial focus to message input box.
             var messageInput = document.getElementById('message');
@@ -84,13 +85,13 @@
             }
 
             function bindConnectionMessage(connection) {
-                var messageCallback = function(name, message) {
+                var messageCallback = function (name, message) {
                     if (!message) return;
                     // Html encode display name and message.
                     var encodedName = name;
                     var encodedMsg = message.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
                     var messageEntry = createMessageEntry(encodedName, encodedMsg);
-                                
+
                     var messageBox = document.getElementById('messages');
                     messageBox.appendChild(messageEntry);
                     messageBox.scrollTop = messageBox.scrollHeight;
@@ -101,13 +102,29 @@
                 connection.onclose(onConnectionError);
             }
 
+            function broadcastMessage(name, message) {
+                $.ajax({
+                    url: '/BroadcastMessage',
+                    type: 'GET',
+                    data: {
+                        name: name,
+                        message: message
+                    },
+                    timeout: 10000,
+                }).done(function (data) {
+                }).fail(function (XMLHttpRequest, textStatus, errorThrown) {
+                });
+            }
+
             function onConnected(connection) {
                 console.log('connection started');
-                connection.send('broadcastMessage', '_SYSTEM_', username + ' JOINED');
+                //connection.send('broadcastMessage', '_SYSTEM_', username + ' JOINED');
+                broadcastMessage('_SYSTEM_', username + ' JOINED')
                 document.getElementById('sendmessage').addEventListener('click', function (event) {
                     // Call the broadcastMessage method on the hub.
                     if (messageInput.value) {
-                        connection.send('broadcastMessage', username, messageInput.value);
+                        //connection.send('broadcastMessage', username, messageInput.value);
+                        broadcastMessage(username, messageInput.value)
                     }
 
                     // Clear text box and reset focus for next comment.
@@ -173,8 +190,9 @@
             $.getJSON('/Join').done(result => {
                 startConnection(result.authInfo.serviceUrl, result.authInfo.accessToken);
             });
-            
+
         });
     </script>
 </body>
+
 </html>
