@@ -1,0 +1,65 @@
+{
+    "$schema": "http://json.schemastore.org/proxies",
+  "proxies": {
+    "signinproxy": {
+      "matchCondition": {
+        "route": "/signin",
+        "methods": [
+          "GET",
+          "POST"
+        ]
+      },
+      "backendUri": "https://%WEBSITE_HOSTNAME%/api/signin"
+    },
+    "Joinproxy": {
+      "matchCondition": {
+        "route": "/Join",
+        "methods": [
+          "GET",
+          "POST"
+        ]
+      },
+      "backendUri": "https://%WEBSITE_HOSTNAME%/api/Join"
+    },
+    "Broadcastproxy": {
+      "matchCondition": {
+        "route": "/BroadcastMessage",
+        "methods": [
+          "GET",
+          "POST"
+        ]
+      },
+      "backendUri": "https://%WEBSITE_HOSTNAME%/api/BroadcastMessage"
+    },
+    "scripts": {
+      "matchCondition": {
+        "route": "/scripts/{*rest}",
+        "methods": [
+          "GET",
+          "OPTIONS"
+        ]
+      },
+      "backendUri": "https://%BlobHost%/wwwroot/scripts/{rest}"
+    },
+    "css": {
+      "matchCondition": {
+        "route": "/css/{*rest}",
+        "methods": [
+          "GET",
+          "OPTIONS"
+        ]
+      },
+      "backendUri": "https://%BlobHost%/wwwroot/css/{rest}"
+    },
+    "default": {
+      "matchCondition": {
+        "route": "/",
+        "methods": [
+          "GET",
+          "OPTIONS"
+        ]
+      },
+      "backendUri": "https://%BlobHost%/wwwroot/index.html"
+    }
+  }
+}
